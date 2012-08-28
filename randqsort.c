@@ -3,6 +3,19 @@
 #include <fcntl.h>
 #include <stdlib.h>
 
+static int cmpint(const int *i1, const int *i2)
+{
+  if (*i1 < *i2) return -1;
+  else if (*i1 > *i2) return 1;
+  else return 0;
+}
+
+void quicksort(int *buffer, int size)
+{
+  qsort(buffer, size, sizeof(int), (int(*)(const void*,const void*))cmpint);
+}
+
+
 int main()
 {
   int randdev;
@@ -10,18 +23,8 @@ int main()
   int *buffer;
 
   // Anzahl der Zahlen
-  //  int size = 1024*1024*1024;
-  int size = 102;
-
-  /* 4GB                */
-  /* real    26m1.151s  */
-  /* user    0m42.967s  */
-  /* sys     25m17.659s */
-
-  /* 400MB              */
-  /* real    3m35.596s  */
-  /* user    0m10.365s  */
-  /* sys     3m24.865s  */
+    int size = 1024*1024;
+  //  int size = 1024;
 
   int i = size;
 
@@ -37,11 +40,17 @@ int main()
 	{
 	  read(randdev, &rand, sizeof(rand));
 	  buffer[i] = rand;
-	  	  printf("%d ", rand);
+	  //	  	  printf("%d ", rand);
 	}
 
       // aufräumen
       close(randdev);
+      
+      // sortieren und ausgeben
+      quicksort(buffer, size);
+      // for (i=0; i<size; i++)
+      // printf("%d\n", buffer[i]);
+
       free(buffer);
       return EXIT_SUCCESS;
     }
