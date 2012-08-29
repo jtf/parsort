@@ -11,7 +11,7 @@
 
 // eigene Definitionen
 #include "mergesort.h"
-
+#include "tools.h"
 
 /* ------------------------------------
  *  Pufferverwaltung
@@ -79,23 +79,23 @@ void quicksort(struct buffer * b)
 
 
 
-int main()
-{
-  struct buffer b;
-  if (allocbuf(&b, 4))
-    {
-      printf(" %d \n", b.size);
-      randbuf(&b);
-      quicksort(&b);
+/* int main() */
+/* { */
+/*   struct buffer b; */
+/*   if (allocbuf(&b, 4)) */
+/*     { */
+/*       printf(" %d \n", b.size); */
+/*       randbuf(&b); */
+/*       quicksort(&b); */
 
-      for (int j=0; j< b.size; j++)
-	printf("%d ", b.data[j]);
+/*       for (int j=0; j< b.size; j++) */
+/* 	printf("%d ", b.data[j]); */
 
-      freebuf(&b);
-    }
-  else
-    {
-      printf("Fehlschlag");
-    }
-}
+/*       freebuf(&b); */
+/*     } */
+/*   else */
+/*     { */
+/*       printf("Fehlschlag"); */
+/*     } */
+/* } */
 
