@@ -11,8 +11,8 @@ int main(int argc, char *argv[])
 {
 
   struct buffer b;
-
   int size = 100;
+
 
   allocbuf(&b, size);
 
@@ -21,9 +21,8 @@ int main(int argc, char *argv[])
 
   quicksort(&b);
 
-  
-  for (int i=0; i<10; i++)
+  for (int i=0; i<size; i++)
     printf("%d ", b.data[i]);
 
-    //  printf("%d\n", cmpint(1,2));
+  freebuf(&b);
 }
