@@ -2,12 +2,13 @@
 #include <sys/stat.h>
 #include <fcntl.h>
 #include <stdlib.h>
+#include "mergesort.h"
 
 int main()
 {
   int randdev;
   int rand;
-  int *buffer;
+  struct buffer b;
 
   // Anzahl der Zahlen
   //  int size = 1024*1024*1024;
@@ -23,26 +24,27 @@ int main()
   /* user    0m10.365s  */
   /* sys     3m24.865s  */
 
-  int i = size;
+  b.size = size;
 
-  buffer = (int*) malloc(i*sizeof(int)); //1024*1024*1024);
+  b.data = (int*) malloc(b.size*sizeof(int)); //1024*1024*1024);
   // Schlägt Allokieren fehl?
-  if( buffer != NULL )
+  if( b.data != NULL )
     {
 
       // random-device öffnen
       randdev  = open("/dev/urandom", O_RDONLY);
 
+      int i = size;
       while( i-- )
 	{
 	  read(randdev, &rand, sizeof(rand));
-	  buffer[i] = rand;
-	  	  printf("%d ", rand);
+	  b.data[i] = rand;
+  	  printf("%d ", rand);
 	}
 
       // aufräumen
       close(randdev);
-      free(buffer);
+      free(b.data);
       return EXIT_SUCCESS;
     }
   return EXIT_FAILURE;
