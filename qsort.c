@@ -14,15 +14,20 @@ int main(int argc, char *argv[])
   int size = 100;
 
 
-  allocbuf(&b, size);
+  if (allocbuf(&b, size))
+    {
+      for (int i=0; i<size; i++)
+	b.data[i]=100-i*2;
+      
+      quicksort(&b);
 
-  for (int i=0; i<size; i++)
-    b.data[i]=100-i*2;
-
-  quicksort(&b);
-
-  for (int i=0; i<size; i++)
-    printf("%d ", b.data[i]);
-
-  freebuf(&b);
+      for (int i=0; i<size; i++)
+	printf("%d ", b.data[i]);
+      
+      freebuf(&b);
+    }
+  else
+    {
+      printf("Fehler beim Allokieren des Puffers\n");
+    }
 }
