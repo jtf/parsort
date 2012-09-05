@@ -29,7 +29,7 @@ int main()
   int i = size;
 
   buffer = (int*) malloc(i*sizeof(int)); //1024*1024*1024);
-  // Schlägt Allokieren fehl?
+  // Schlägt Allokation fehl?
   if( buffer != NULL )
     {
 

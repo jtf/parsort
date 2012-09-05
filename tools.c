@@ -17,7 +17,7 @@
  *  Pufferverwaltung
  * ------------------------------------ */
 
-/* Allokiert einen Puffer mit Puffergröße size
+/* Alloziert einen Puffer mit Puffergröße size
    Fehlschlag: return 0
    Sonst:      return 1
 */
@@ -57,6 +57,26 @@ void randbuf(struct buffer * b)
     }
 
   close(randdev);
+}
+
+/* Gib die ersten num Elemente aus */
+void prtbhead(struct buffer *b, int num)
+{
+  int j;
+  for (j=0; (j< b->size)&&(j<num); j++)
+        printf("%d ", b->data[j]);
+}
+
+/* Gib die letzten num Elemente aus */
+void prtbtail(struct buffer *b, int num)
+{
+  int j;
+  if (b->size < num)
+    j = b->size;
+  else
+    j = b->size - num;
+  for (j; j< b->size; j++)
+        printf("%d ", b->data[j]);
 }
 
 /* ------------------------------------

@@ -28,6 +28,6 @@ int main(int argc, char *argv[])
     }
   else
     {
-      printf("Fehler beim Allokieren des Puffers\n");
+      printf("Fehler beim Allozieren des Puffers\n");
     }
 }
