@@ -1,5 +1,4 @@
- // Allgemeine Header
-
+// Allgemeine Header
 #include <stdlib.h>
 #include <stdio.h>
 
@@ -23,7 +22,7 @@
 */
 int allocbuf(struct buffer * b, size_t size)
 {
-  b->data = (int*) malloc(size* sizeof(int));
+  b->data = (int*) malloc(size * sizeof(int));
   if (b->data != NULL)
     {
       b->size = size;

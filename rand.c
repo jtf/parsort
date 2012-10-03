@@ -39,7 +39,7 @@ int main()
 	{
 	  read(randdev, &rand, sizeof(rand));
 	  b.data[i] = rand;
-  	  printf("%d ", rand);
+	  printf("%d ", rand);
 	}
 
       // aufräumen
