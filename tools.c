@@ -187,3 +187,47 @@ void mergesort(struct buffer *b, struct buffer *tmp)
       memcpy(b->data, tmp->data, tmp->size * sizeof(int));
    }
 }
+
+/* ------------------------------------
+ *  merge two runs in a third
+ * ------------------------------------ */
+void merge(struct buffer * b1, struct buffer * b2, struct buffer * ret)
+{
+  int * l = b1->data;
+  int * r = b2->data;
+
+  int * last1 = b1->data + b1->size - 1;
+  int * last2 = b2->data + b2->size - 1;
+
+  //  struct buffer * retbuf;
+  int * t;
+
+  //  allocbuf(retbuf, b1->size + b2->size);
+
+  t = ret->data; 
+
+  // inc over all l and r pointer by smallest element
+  while ( l <= last1 && r <= last2)
+    {
+      printf("+");
+      if ( *l <= *r )
+	{
+	  *t = *l++; //same as: *t = *l; l++;
+	} else {
+	*t = *r++;   //same as: *t = *r; r++;
+      }
+      t++;
+    }
+  // add remaining left tail
+  while (l <= last1)
+    {
+      printf("<");
+      *t++ = *l++;   //same as: *t = *l; l++; t++
+    }
+  //add remaining right tail
+  while (r <= last2)
+    {
+      printf(">");
+      *t++ = *r++;   //same as: *t = *r; l++; r++
+    }
+}
