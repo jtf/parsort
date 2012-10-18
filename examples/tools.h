@@ -11,4 +11,6 @@ void prtbtail(struct buffer * b, int num);
 void quicksort(struct buffer * b);
 void mergesort(struct buffer * b, struct buffer * tmp);
 
+void merge(struct buffer * b1, struct buffer * b2, struct buffer * ret);
+
 #endif
