@@ -1,6 +1,7 @@
 // Allgemeine Header
 #include <stdlib.h>
 #include <stdio.h>
+#include <string.h>
 
 // fürs Random-Device
 #include <sys/types.h>
@@ -96,25 +97,93 @@ void quicksort(struct buffer * b)
   qsort(b->data, b->size, sizeof(int), (int(*)(const void*,const void*))cmpint);
 }
 
+/* ------------------------------------
+ *  Mergesort (lokal)
+ * ------------------------------------ */
+// set given buffer on new values
+// usage: setbuffer(&c, b.data +3, b.size);
+void setbuffer(struct buffer *b, int * data, int size)
+{
+  //printf(".");
+  b->data = data;
+  b->size = size;
+}
 
+void mergesort(struct buffer *b, struct buffer *tmp)
+{
+  // buffers for each partition
+  struct buffer leftb;
+  struct buffer rightb;
 
-/* int main() */
-/* { */
-/*   struct buffer b; */
-/*   if (allocbuf(&b, 4)) */
-/*     { */
-/*       printf(" %d \n", b.size); */
-/*       randbuf(&b); */
-/*       quicksort(&b); */
+  struct buffer ltmpb;
+  struct buffer rtmpb;
 
-/*       for (int j=0; j< b.size; j++) */
-/* 	printf("%d ", b.data[j]); */
+  // temp int for swap
+  int tempi;
 
-/*       freebuf(&b); */
-/*     } */
-/*   else */
-/*     { */
-/*       printf("Fehlschlag"); */
-/*     } */
-/* } */
+  // working pointer for left and right partition, temp buffer and last of b
+  int * l;
+  int * r;
+  int * t;
+  int * last;
 
+  /* buffer size check - termination check*/
+  // sort buffer elements
+  if (b->size == 2)
+    {
+      // swap if first element is greater
+      if (b->data[0] > b->data[1])
+	{
+	  tempi = b->data[0];
+	  b->data[0] = b->data[1];
+	  b->data[1] = tempi;
+	}
+      return;
+    }
+  else
+    {
+
+      // set range for new partitions
+      setbuffer(&leftb,   b->data,   b->size/2);
+      setbuffer(&ltmpb, tmp->data, tmp->size/2);
+      setbuffer(&rightb,  b->data +   b->size/2,   (b->size+1)/2);
+      setbuffer(&rtmpb, tmp->data + tmp->size/2, (tmp->size+1)/2);
+
+      /* recursion */
+      if (leftb.size > 1)  mergesort(&leftb,  &ltmpb);
+
+      if (rightb.size > 1) mergesort(&rightb, &rtmpb);
+
+      /* merge - merge it by pointer only merge : ) */
+      // left, right and temp working pointer
+      l = leftb.data;
+      r = rightb.data;
+      t = tmp->data;
+      last = b->data + b->size-1;
+
+      // inc over all l and r pointer by smallest element
+      while ( l <= rightb.data && r <= last)
+	{
+	  if ( *l <= *r )
+	    {
+	      *t = *l++; //same as: *t = *l; l++;
+	    } else {
+	    *t = *r++;   //same as: *t = *r; r++;
+	  }
+	  t++;
+	}
+      // add remaining left tail
+      while (l < rightb.data)
+	{
+	  *t++ = *l++;   //same as: *t = *l; l++; t++
+	}
+      //add remaining right tail
+      while (r < last)
+	{
+	  *t++ = *r++;   //same as: *t = *r; l++; r++
+	}
+
+      /* copy tmp buffer back to original buffer */
+      memcpy(b->data, tmp->data, tmp->size * sizeof(int));
+   }
+}

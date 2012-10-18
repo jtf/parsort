@@ -9,5 +9,6 @@ void prtbhead(struct buffer * b, int num);
 void prtbtail(struct buffer * b, int num);
 
 void quicksort(struct buffer * b);
+void mergesort(struct buffer * b, struct buffer * tmp);
 
 #endif
