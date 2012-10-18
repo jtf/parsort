@@ -4,6 +4,7 @@
 int allocbuf(struct buffer * b, size_t size);
 void freebuf(struct buffer * b);
 void randbuf(struct buffer * b);
+void set_buffer(struct buffer *b, int * data, int size);
 
 void prtbhead(struct buffer * b, int num);
 void prtbtail(struct buffer * b, int num);

@@ -209,7 +209,6 @@ void merge(struct buffer * b1, struct buffer * b2, struct buffer * ret)
   // inc over all l and r pointer by smallest element
   while ( l <= last1 && r <= last2)
     {
-      printf("+");
       if ( *l <= *r )
 	{
 	  *t = *l++; //same as: *t = *l; l++;
@@ -221,13 +220,11 @@ void merge(struct buffer * b1, struct buffer * b2, struct buffer * ret)
   // add remaining left tail
   while (l <= last1)
     {
-      printf("<");
       *t++ = *l++;   //same as: *t = *l; l++; t++
     }
   //add remaining right tail
   while (r <= last2)
     {
-      printf(">");
       *t++ = *r++;   //same as: *t = *r; l++; r++
     }
 }
