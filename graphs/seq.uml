@@ -1,0 +1,19 @@
+@startuml img/slaveState.pdf
+
+    participant Master
+
+    Slave1 -> Master : ready (size)
+    Slave2 -> Master : ready (size)
+
+    Master -> Slave1 : do_send (to)
+    Master -> Slave2 : do_receive
+
+    Slave1 -> Slave2 : (run)
+    destroy Slave1
+
+@enduml
+
+@startuml img/lol.png
+
+@enduml
+

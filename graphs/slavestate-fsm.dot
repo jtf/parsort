@@ -1,0 +1,15 @@
+digraph finite_state_machine {
+    rankdir=LR;
+
+    node [shape = point ] q;
+    node [shape = doublecircle, label="-1"] tot;
+    node [shape = circle, label="-2"] sortiert;
+    node [shape = circle, label=">0"] bereit;
+    node [shape = circle, label="0"]  rechne;
+
+    q        -> sortiert;
+    sortiert -> bereit    [label = "fertig"];
+    bereit   -> tot;
+    bereit   -> rechne;
+    rechne   -> bereit;
+}
