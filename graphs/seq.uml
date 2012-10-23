@@ -1,19 +1,81 @@
-@startuml img/slaveState.pdf
+' -*- mode: plantuml -*-
+' vim:filetype=plantuml
 
+
+
+@startuml
+    skinparam monochrome true
+'    autonumber
+    header ParES - Paralleler Mergesort
     participant Master
 
-    Slave1 -> Master : ready (size)
-    Slave2 -> Master : ready (size)
+== Initialisierung ==
+    activate Master
+    activate Slave1
+    activate Slave2
+    activate Slave3
 
-    Master -> Slave1 : do_send (to)
-    Master -> Slave2 : do_receive
+== Chunks verschicken ==
 
-    Slave1 -> Slave2 : (run)
+  loop Chunknum times
+    Slave1 -> Master : bereit ()
+    Slave2 -> Master : bereit ()
+    Slave3 -> Master : bereit ()
+
+    Master -> Slave1 : (chunk)
+    Master -> Slave2 : (chunk) 
+    Master -> Slave3 : (chunk) 
+
+note over Slave2: Lokales Sortieren und lokales Mergen
+  end
+
+
+== Inter-Slave-Merge ==
+
+note over Master: Alle Chunks verteilt und sortiert
+
+group while moreThanTwoSlaves()
+
+'== END_TAG verschicken ==
+
+    Slave3 -> Master : bereit  ()
+    Master -> Slave3 : END_TAG () 
+    Slave3 -> Master : (slave3Result.size)
+|||
+    Slave1 -> Master : bereit ()
+    Master -> Slave1 : END_TAG ()
+    Slave1 -> Master : (slave1Result.size)
+|||
+    Master -> Slave3 : DO_SEND_TAG (target: Slave1)
+    Master -> Slave1 : DO_RECV_TAG (slave3Result.size)
+
+    Slave3 -> Slave1 : (slave3Result.data)
+    destroy Slave3
+
+note over Slave1: merge(slave1Result.data, slave3Result.data)    
+|||
+    Slave2 -> Master : bereit ()
+    Master -> Slave2 : END_TAG () 
+    Slave2 -> Master : (slave2Result.size)
+|||
+    Slave1 -> Master : (slave1Result.size)
+    
+
+end
+
+== Master-Merge ==
+
+    Master -> Slave1 : DO_SEND_TAG (target: master)
+    Master -> Slave2 : DO_SEND_TAG (target: master)
+    
+    Slave1 -> Master : (slave1Result.data)
     destroy Slave1
 
+    Slave2 -> Master : (slave2Result.data)
+    destroy Slave2
+
+    note over Master: merge(slave1Result.data, slave2Result.data)    
+
+    deactivate Master
+
 @enduml
-
-@startuml img/lol.png
-
-@enduml
-
