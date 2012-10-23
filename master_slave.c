@@ -12,8 +12,8 @@
 #define DO_SEND_TAG 4
 
 //MB Ints (xMio-Int-Zahlen)
-#define VOLUMESIZE 1000
-#define CHUNKSIZE 10
+#define VOLUMESIZE 100000
+#define CHUNKSIZE 100
 
 //SlaveStates
 #define SLAVE_NOT_READY -2
@@ -109,7 +109,7 @@ int main(int argc, char **argv) {
 			// >0 - slave ist bereit (mit Daten)
 		for(i=0; i<numNodes; i++)
 			slaveState[i]=SLAVE_NOT_READY;
-		int x;
+		int x, y=0;
 		int minNode;
 		int maxNode;
 		//init von runSize, da bei ersten Durchlauf im Slave keine Daten verschickt werden
@@ -118,9 +118,9 @@ int main(int argc, char **argv) {
 		{
 			MPI_Recv(&runSize, 1, MPI_INT, MPI_ANY_SOURCE, MPI_ANY_TAG, MPI_COMM_WORLD, &status);
 
-			if(runSize)
+			if(runSize > 0)
 				slaveState[status.MPI_SOURCE] = runSize;
-			else
+			else if(runSize == 0)
 			{
 				printf("Master: Sende END_TAG an Node %d.\n", status.MPI_SOURCE);			
 				MPI_Send(0, 0, MPI_INT, status.MPI_SOURCE, END_TAG, MPI_COMM_WORLD);
@@ -128,6 +128,9 @@ int main(int argc, char **argv) {
 			// >= 2 Slaves haben runSize an Master gesendet und warten auf Partnervermittlung
 			if(slavesReady(slaveState, numNodes))
 			{
+				y++;
+				if(y==50)
+					break;
 				////Workaround MPI_Send mit Konstante
 				//int * do_recv;
 				//*do_recv=DO_RECV;
@@ -138,18 +141,18 @@ int main(int argc, char **argv) {
 				}
 				maxNode = max_array(slaveState, numNodes);
 				minNode = min_array(slaveState, numNodes, maxNode);
-				//Speicherung für den Master
-				slaveState[maxNode] = SLAVE_NOT_READY;
-				slaveState[minNode] = SLAVE_DEAD;
-				printf("maxNode: %d\n", maxNode);
-				printf("minNode: %d\n", minNode);
-				printf("\n");
+				//printf("maxNode: %d\n", maxNode);
+				//printf("minNode: %d\n", minNode);
 				//Senden der Merging-Infos an die Slaves
 				MPI_Send(&slaveState[minNode], 1, MPI_INT, maxNode, DO_RECV_TAG, MPI_COMM_WORLD);
 				slaveState[maxNode] = SLAVE_BUSY;
 				MPI_Send(&maxNode, 1, MPI_INT, minNode, DO_SEND_TAG, MPI_COMM_WORLD);
 				slaveState[minNode] = SLAVE_DEAD;
-
+				for(x=0; x<numNodes; x++)
+				{
+					printf("Node %d: %d\n", x, slaveState[x]);
+				}
+				printf("\n");
 			}
 
 		}
@@ -253,7 +256,7 @@ int main(int argc, char **argv) {
 			if(status.MPI_TAG == DO_RECV_TAG)
 			{
 				allocbuf(&run, runSize);
-				MPI_Recv(&run, runSize, MPI_INT, MPI_ANY_SOURCE, MPI_ANY_TAG, MPI_COMM_WORLD, &status);
+				MPI_Recv(run.data, run.size, MPI_INT, MPI_ANY_SOURCE, MPI_ANY_TAG, MPI_COMM_WORLD, &status);
 
 				//eingehenden Run in slaveResult mergen
 				tmpBuf.data = slaveResult.data;
@@ -263,13 +266,15 @@ int main(int argc, char **argv) {
 				freebuf(&tmpBuf);
  				freebuf(&run);
 			}
-			else //Wenn DO_SEND_TAG
+			else if (status.MPI_TAG == DO_SEND_TAG)
 			{
 				//&runSize = Empfänger
 				MPI_Send(slaveResult.data, slaveResult.size, MPI_INT, runSize, 0, MPI_COMM_WORLD);
 				freebuf(&slaveResult);
 				break;
 			}
+			else
+				printf("\n\n\nTritt nie auf!!!!!\n\n\n");
 		}
 		//prtbhead(&slaveResult,6);
 		//printf("\n");
