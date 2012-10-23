@@ -10,7 +10,6 @@
 #include <unistd.h>
 
 // eigene Definitionen
-#include "mergesort.h"
 #include "tools.h"
 
 /* ------------------------------------

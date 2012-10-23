@@ -3,7 +3,6 @@
 #include <math.h>
 #include <mpi.h>
 #include <string.h>
-#include "mergesort.h"
 #include "tools.h"
 
 #define WORKTAG 1

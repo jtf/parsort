@@ -1,7 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#include "mergesort.h"
 #include "tools.h"
 
 void inssort(struct buffer *b)
@@ -13,15 +12,19 @@ void inssort(struct buffer *b)
   int item;
 
   last = b->data + b->size-1;
-  i = b->data;
+  i = b->data++; // mit dem Zweiten beginnen
 
-  while (i < last)
-    {
-      item = *b->data[i];
+  while(i <= last++){
+    item = *i;
 
-      
-	i++;
-    }
+    j = i;
+    //solange j nicht am Anfang und item kleiner als Vorgänger
+    while ((j > b->data) && (item < *(i--)))
+      {
+	*j = *(j--)	
+      }
+    i++;
+  }
 }
 
 int main(int argc, char *argv[])

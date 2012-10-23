@@ -3,7 +3,6 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "mergesort.h"
 #include "tools.h"
 
 
