@@ -34,7 +34,7 @@ note over Slave2: Lokales Sortieren und lokales Mergen
 
 note over Master: Alle Chunks verteilt und sortiert
 
-group while moreThanTwoSlaves()
+group while moreThanTwoSlaves() oder mindestens noch einer beschaeftigt
 
 '== END_TAG verschicken ==
 
