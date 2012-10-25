@@ -11,23 +11,28 @@ int main(int argc, char *argv[])
 
   struct buffer a,b,c;
 
-  int size = 5;
 
-  if (allocbuf(&a, 2*size) && allocbuf(&b,1* size) && allocbuf(&c, 3*size))
+  if (allocbuf(&a, 7) && allocbuf(&b, 3) && allocbuf(&c, a.size + b.size))
     {
       printf("yay alloziert\n");
 
-      for (int i=0; i<2*size; i++)
+      for (int i=0; i<a.size; i++)
 	{
-	  a.data[i]=2*i;
-	  //b.data[i]=i;
+	  a.data[i]=i-3;
 	}
-      
+
+      for (int i=0; i<b.size; i++)
+	{
+	  b.data[i]=i-9;
+	}
+
       merge(&a, &b, &c);
       
-      for (int i=0; i<size*2; i++)
+      for (int i=0; i< a.size + b.size; i++)
 	printf("%d ", c.data[i]);
-      
+
+      printf("\nGrößen: a: %d b: %d c: %d\n", a.size, b.size, c.size);
+
       freebuf(&a);
       freebuf(&b);
       freebuf(&c);
