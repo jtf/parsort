@@ -4,6 +4,7 @@
 #include <mpi.h>
 #include <string.h>
 #include "tools.h"
+#include "helper.h"
 
 //SlaveMessages
 #define WORK_TAG 1
