@@ -1,0 +1,20 @@
+' -*- mode: plantuml -*-
+' vim:filetype=plantuml
+
+@startuml
+    skinparam monochrome true
+'    autonumber
+'    header ParES - Paralleler Mergesort
+
+    sortiert    : -2
+    bereit      : >0
+    tot         : -1
+    beschäftigt : 0
+
+    [*] -> sortiert          : ENDTAG erhalten
+    sortiert --> bereit      : lokales Sortieren abgeschlossen
+    bereit --> tot           : alle Daten verschickt
+    bereit -right-> beschäftigt   : Daten zum Mergen erhalten
+    beschäftigt  -left-> bereit  : Mergen abgeschlossen
+    tot --> [*]
+@enduml
