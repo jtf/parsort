@@ -1,16 +1,21 @@
 #include <stdlib.h>
 #include <argp.h>
+#include "helper.h"
+
+/* * * * * * * * * * * * * * * * * */
+/* Functions for Argument Parsing  */
+/* * * * * * * * * * * * * * * * * */
 
 /* Used by main to communicate with parse_opt. */
-struct config
-{
-  int volumesize;
-  int chunksize;
-  int cachesize;
-  int qsort;
-  int msort;
-  int isort;
-};
+/* struct config */
+/* { */
+/*   int volumesize; */
+/*   int chunksize; */
+/*   int cachesize; */
+/*   int qsort; */
+/*   int msort; */
+/*   int isort; */
+/* }; */
 
 /* The options we understand. */
 // OPTIONS  -- A pointer to a vector of struct argp_option
@@ -80,6 +85,9 @@ void argparse(int argc, char **argv, struct config *cfg)
   argp_parse(&argopts, argc, argv, ARGP_NO_ARGS, 0, cfg);
 }
 
+/* * * * * * * * * * * * * * * * * */
+/* Functions for Slave State Array */
+/* * * * * * * * * * * * * * * * * */
 
 int max_array(int * a, int num)
 {
@@ -168,4 +176,22 @@ int getReadySlave(int * a, int num)
 	  return i;
 	}
     }
+}
+
+
+// Print Slave States
+void prtslavestate(int * slaveState, int numNodes)
+{
+  int x;
+  printf("Node:");
+  for(x=0; x<numNodes; x++)
+    {
+      printf("\t%d", x);
+    }
+  printf("\nState:");
+  for(x=0; x<numNodes; x++)
+    {
+      printf("\t%d", slaveState[x]);
+    }
+  printf("\n");
 }

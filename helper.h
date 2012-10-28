@@ -4,6 +4,17 @@
 #include <stdlib.h>
 #include <argp.h>
 
+//SlaveMessages
+#define WORK_TAG    1
+#define END_TAG     2
+#define DO_RECV_TAG 3
+#define DO_SEND_TAG 4
+
+//SlaveStates
+#define SLAVE_NOT_READY -2
+#define SLAVE_DEAD      -1
+#define SLAVE_BUSY       0
+
 /* Used by argparse to communicate with argp. */
 struct config
 {
@@ -19,11 +30,13 @@ struct config
 void argparse(int argc, char **argv, struct config *cfg);
 
 // slave status functions
-int slaveBusy(int * a, int num);
-int moreThanTwoSlaves(int * a, int num);
 int max_array(int * a, int num);
 int min_array(int * a, int num, int maxPos);
+int slaveBusy(int * a, int num);
+int moreThanTwoSlaves(int * a, int num);
 int slavesReady(int * a, int num);
 int getReadySlave(int * a, int num);
+
+void prtslavestate(int * slaveState, int numNodes)
 
 #endif
