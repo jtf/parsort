@@ -15,6 +15,15 @@ struct config
   int isort;
 };
 
+// argument passing function
 void argparse(int argc, char **argv, struct config *cfg);
+
+// slave status functions
+int slaveBusy(int * a, int num);
+int moreThanTwoSlaves(int * a, int num);
+int max_array(int * a, int num);
+int min_array(int * a, int num, int maxPos);
+int slavesReady(int * a, int num);
+int getReadySlave(int * a, int num);
 
 #endif

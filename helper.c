@@ -80,3 +80,92 @@ void argparse(int argc, char **argv, struct config *cfg)
   argp_parse(&argopts, argc, argv, ARGP_NO_ARGS, 0, cfg);
 }
 
+
+int max_array(int * a, int num)
+{
+  int i, position=1, max=0;
+  for (i=1; i<num; i++)
+    {
+      if (a[i]>max)
+	{
+	  max=a[i];
+	  position=i;
+	}
+    }
+  return(position);
+}
+
+
+//min nur nach max aufrufen!!
+int min_array(int * a, int num, int maxPos)
+{
+	
+  int i, position=1, min=a[maxPos];
+  for (i=1; i<num; i++)
+    {
+      if ((a[i]<=min) && (a[i]>0))
+	{
+	  min=a[i];
+	  position=i;
+	}
+    }
+  return(position);
+}
+
+
+int slavesReady(int * a, int num)
+{
+  int ret=0, i;
+  for(i=1; i<num; i++)
+    {
+      if(a[i]>0)
+	ret++;
+    }
+  if(ret>=2)
+    return 1;
+  else
+    return 0;
+}
+
+
+//InterSlaveMerge: mindestens 1 Slave noch beim Mergen?
+int slaveBusy(int * a, int num)
+{
+  int i;
+  for(i=1; i<num; i++)
+    {
+      if(a[i] == 0)
+	return 1;
+    }
+  return 0;		
+}
+
+
+//InterSlaveMerge: mindestens 3 Slaves lebendig?
+int moreThanTwoSlaves(int * a, int num)
+{
+  int rest=num-1, i;
+  for(i=1; i<num; i++)
+    {
+      if(a[i] == SLAVE_DEAD)
+	rest--;
+    }
+  if(rest == 2)
+    return 0;
+  else
+    return 1;
+}
+
+
+//Mastermerge: Slave zurückgeben
+int getReadySlave(int * a, int num)
+{
+  int i;
+  for(i=0; i<num; i++)
+    {
+      if(a[i] > SLAVE_BUSY)
+	{
+	  return i;
+	}
+    }
+}
