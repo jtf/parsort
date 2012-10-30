@@ -12,9 +12,10 @@
     beschäftigt : 0
 
     [*] -> sortiert          : ENDTAG erhalten
-    sortiert --> bereit      : lokales Sortieren abgeschlossen
+    sortiert -down-> bereit  : lokales Sortieren abgeschlossen
     bereit --> tot           : alle Daten verschickt
-    bereit -right-> beschäftigt   : Daten zum Mergen erhalten
-    beschäftigt  -left-> bereit  : Mergen abgeschlossen
+    bereit -left-> beschäftigt   : Daten zum Mergen erhalten
+    beschäftigt  -right-> bereit  : Mergen abgeschlossen
+    sortiert --> tot         : nie Daten erhalten
     tot --> [*]
 @enduml
