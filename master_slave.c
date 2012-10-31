@@ -11,6 +11,7 @@
 #define END_TAG 2
 #define DO_RECV_TAG 3
 #define DO_SEND_TAG 4
+#define DEAD_TAG 5
 
 //MB Ints (xMio-Int-Zahlen)
 // jetzt in cfg.*
@@ -119,9 +120,24 @@ int main(int argc, char **argv) {
 			}
 			else if(runSize == 0)
 			{
-				printf("Master: Sende END_TAG an Node %d.\n", status.MPI_SOURCE);		
+				printf("Master: Sende END_TAG an Node %d.\n", status.MPI_SOURCE);
 				MPI_Send(0, 0, MPI_INT, status.MPI_SOURCE, END_TAG, MPI_COMM_WORLD);
 				cntEndtag++;
+				printf("\nNode:");
+				for(x=0; x<numNodes; x++)
+				{
+					printf(" %d", x);
+				}
+				printf("\nState:");
+				for(x=0; x<numNodes; x++)
+				{
+					printf(" %d", slaveState[x]);
+				}
+			}
+			else if(runSize == -1)
+			{
+				slaveState[status.MPI_SOURCE]=-1;
+				MPI_Send(0, 0, MPI_INT, status.MPI_SOURCE, DEAD_TAG, MPI_COMM_WORLD);
 			}
 
 			//Wenn mindestens 3 Slaves leben und 2 der 3 eine RunSize gemeldet haben
@@ -134,12 +150,12 @@ int main(int argc, char **argv) {
 				printf("\nNode:");
 				for(x=0; x<numNodes; x++)
 				{
-					printf("\t%d", x);
+					printf(" %d", x);
 				}
 				printf("\nState:");
 				for(x=0; x<numNodes; x++)
 				{
-					printf("\t%d", slaveState[x]);
+					printf(" %d", slaveState[x]);
 				}
 				printf("\n");
 				maxNode = max_array(slaveState, numNodes);
@@ -152,9 +168,11 @@ int main(int argc, char **argv) {
 				//printf("maxNode: %d\n", maxNode);
 				//printf("minNode: %d\n", minNode);
 				//Senden der Merging-Infos an die Slaves
+				//printf("Sende ISM-Daten (1) an Slave %d",maxNode);
 				MPI_Send(&slaveState[minNode], 1, MPI_INT, maxNode, DO_RECV_TAG, MPI_COMM_WORLD);
 				printf("-maxNode: %d\n",maxNode);
 				slaveState[maxNode] = SLAVE_BUSY;
+				//printf("Sende ISM-Daten (2) an Slave %d",minNode);
 				MPI_Send(&maxNode, 1, MPI_INT, minNode, DO_SEND_TAG, MPI_COMM_WORLD);
 				printf(";minNode: %d\n",minNode);
 				slaveState[minNode] = SLAVE_DEAD;
@@ -210,10 +228,10 @@ int main(int argc, char **argv) {
 		merge(&preResultL, &preResultR, &volume);
 		printf("Master: Finales Merging abgeschlossen!\n\n\n");
 
-		prtbhead(&volume,volume.size);
-		printf("\n");
-//		prtbtail(&volume,6);
+//		prtbhead(&volume,volume.size);
 //		printf("\n");
+		prtbtail(&volume,6);
+		printf("\n");
 	}
 
 
@@ -256,6 +274,7 @@ int main(int argc, char **argv) {
 		/* //Chunks verarbeiten////////////////////////////////////////// */
 		/* ////////////////////////////////////////////////////////////// */
 		printf("Slave %d: Beginne mit Verarbeiten der Chunks.\n", rank);
+		int anyData=0;
 		while(1)
 		{
 			allocbuf(&chunk, cfg.chunksize);
@@ -272,6 +291,8 @@ int main(int argc, char **argv) {
 				printf("Slave %d: END_TAG empfangen.\n", rank);
 				break;
 			}
+			else
+				anyData=1;
 
 			//neuen Chunk in den bestehenden Run einmergen
 			quicksort(&chunk);
@@ -286,6 +307,8 @@ int main(int argc, char **argv) {
 		//Alle Chunks erhalten: Warten auf InterSlaveMerge-Befehle		
 		while(1)
 		{
+			if(!(anyData))
+				slaveResult.size=-1;
 			MPI_Send(&slaveResult.size, 1, MPI_INT, 0, 0, MPI_COMM_WORLD);
 			MPI_Recv(&runSize, 1, MPI_INT, 0, MPI_ANY_TAG, MPI_COMM_WORLD, &status);
 			if(status.MPI_TAG == DO_RECV_TAG)
@@ -304,15 +327,23 @@ int main(int argc, char **argv) {
 			else if (status.MPI_TAG == DO_SEND_TAG)
 			{
 				//&runSize = Empfänger
-				prtbhead(&slaveResult,slaveResult.size);
+				//prtbhead(&slaveResult,slaveResult.size);
 				printf("\n");
 				MPI_Send(slaveResult.data, slaveResult.size, MPI_INT, runSize, 0, MPI_COMM_WORLD);
 				printf("Datasize von Node %d: %d\n",rank, slaveResult.size);
 				freebuf(&slaveResult);
 				break;
 			}
+			else if (status.MPI_TAG == DEAD_TAG)
+			{
+				printf("Slave %d: Ich arme Sau habe nie Daten bekommen!\n",rank);
+				break;
+			}
 			else
-				printf("\n\n\nUngueltiges TAG empfangen!!!!!\nTag: %d\n\n", status.MPI_TAG);
+			{
+				printf("\n\nUngueltiges TAG empfangen!!!!! Tag: %d\n", status.MPI_TAG);
+				printf("slaveResult Slave %d: %d", rank, slaveResult.size);
+			}
 		}
 
 		//prtbhead(&slaveResult,6);
