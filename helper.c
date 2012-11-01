@@ -135,6 +135,15 @@ int slavesReady(int * a, int num)
     return 0;
 }
 
+int waitingForResults(int * a, int num)
+{
+  int i;
+  for(i=1; i<num; i++)
+    {
+      if(a[i] == SLAVE_NOT_READY)
+	return 1;
+    }
+  return 0;
 
 //InterSlaveMerge: mindestens 1 Slave noch beim Mergen?
 int slaveBusy(int * a, int num)

@@ -36,6 +36,7 @@ int slaveBusy(int * a, int num);
 int moreThanTwoSlaves(int * a, int num);
 int slavesReady(int * a, int num);
 int getReadySlave(int * a, int num);
+int waitingForResults(int * a, int num);
 
 void prtslavestate(int * slaveState, int numNodes);
 

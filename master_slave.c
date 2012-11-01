@@ -108,8 +108,10 @@ int main(int argc, char **argv) {
 		int maxNode;
 		int cntEndtag=0;
 		int runSize;
-		while(moreThanTwoSlaves(slaveState, numNodes) || (cntEndtag < numNodes-1)
-				|| (slaveBusy(slaveState,numNodes) && (!(moreThanTwoSlaves(slaveState, numNodes) || (cntEndtag < numNodes-1)))))
+		while(moreThanTwoSlaves(slaveState, numNodes) || (cntEndtag < numNodes)
+				|| (slaveBusy(slaveState,numNodes) && (!(moreThanTwoSlaves(slaveState, numNodes)
+				|| (cntEndtag < numNodes))))
+			/*	|| (moreThanTwoSlaves(slaveState, numNodes) && (slavesReady(slaveState, numNodes)<2))*/ )
 		{
 			runSize=0;
 			MPI_Recv(&runSize, 1, MPI_INT, MPI_ANY_SOURCE, MPI_ANY_TAG, MPI_COMM_WORLD, &status);
@@ -120,10 +122,12 @@ int main(int argc, char **argv) {
 			}
 			else if(runSize == 0)
 			{
-				printf("Master: Sende END_TAG an Node %d.\n", status.MPI_SOURCE);
+				printf("Master: Sende END_TAG an Slave %d.\n", status.MPI_SOURCE);
 				MPI_Send(0, 0, MPI_INT, status.MPI_SOURCE, END_TAG, MPI_COMM_WORLD);
 				cntEndtag++;
-				printf("\nNode:");
+				if(cntEndtag == numNodes-1)
+					cntEndtag++;
+				printf("\nSlave:");
 				for(x=0; x<numNodes; x++)
 				{
 					printf(" %d", x);
@@ -147,7 +151,7 @@ int main(int argc, char **argv) {
 				//int * do_recv;
 				//*do_recv		int master=0;=DO_RECV;
 				//Senderichtung bestimmen
-				printf("\nNode:");
+				printf("\nSlave:");
 				for(x=0; x<numNodes; x++)
 				{
 					printf(" %d", x);
@@ -180,15 +184,17 @@ int main(int argc, char **argv) {
 			//printf(".");
 
 		}
-		/*for(x=0; x<numNodes; x++)
+
+		printf("\nSlave:");
+		for(x=0; x<numNodes; x++)
 		{
-			printf("\t0	0	%d", x);
+			printf("\t %d", x);
 		}
 		printf("\nState:");
 		for(x=0; x<numNodes; x++)
 		{
 			printf("\t%d", slaveState[x]);
-		}*/
+		}
 		printf("\n\n\nJetzt ist der Master draußen\n\n\n");
 
 
@@ -207,6 +213,12 @@ int main(int argc, char **argv) {
 		allocbuf(&preResultL,slaveState[slaveL]);
 		slaveState[slaveL]=SLAVE_DEAD;
 
+		if(waitingForResults(slaveState, numNodes))
+		{
+			MPI_Recv(&runSize, 1, MPI_INT, MPI_ANY_SOURCE, MPI_ANY_TAG, MPI_COMM_WORLD, &status);
+			slaveState[status.MPI_SOURCE] = runSize;
+		}
+		
 		slaveR=getReadySlave(slaveState, numNodes);
 		printf("SlaveR: %d\n", slaveR);
 		MPI_Send(&master, 1, MPI_INT, slaveR, DO_SEND_TAG, MPI_COMM_WORLD);
@@ -304,7 +316,10 @@ int main(int argc, char **argv) {
 			freebuf(&chunk);
 		}
 		printf("Slave %d - SlaveResult: %d\n",rank,slaveResult.size);
-		//Alle Chunks erhalten: Warten auf InterSlaveMerge-Befehle		
+
+		//////////////////////////////////////////////////////////////////////////////
+		//Alle Chunks erhalten: Warten auf InterSlaveMerge-Befehle////////////////////
+		//////////////////////////////////////////////////////////////////////////////
 		while(1)
 		{
 			if(!(anyData))
