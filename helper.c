@@ -144,6 +144,7 @@ int waitingForResults(int * a, int num)
 	return 1;
     }
   return 0;
+}
 
 //InterSlaveMerge: mindestens 1 Slave noch beim Mergen?
 int slaveBusy(int * a, int num)
