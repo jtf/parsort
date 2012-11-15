@@ -61,6 +61,7 @@ void randbuf(struct buffer * b)
 /* Gib die ersten num Elemente aus */
 void prtbhead(struct buffer *b, int num)
 {
+  printf("Head (%d): ", num);
   int j;
   for (j=0; (j< b->size)&&(j<num); j++)
         printf("%d ", b->data[j]);
@@ -69,6 +70,7 @@ void prtbhead(struct buffer *b, int num)
 /* Gib die letzten num Elemente aus */
 void prtbtail(struct buffer *b, int num)
 {
+  printf("Tail: (%d): ", num);
   int j;
   if (b->size < num)
     j = b->size;

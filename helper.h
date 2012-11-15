@@ -38,6 +38,6 @@ int slavesReady(int * a, int num);
 int getReadySlave(int * a, int num);
 int waitingForResults(int * a, int num);
 
-void prtslavestate(int * slaveState, int numNodes);
+void prtSlaveState(int * slaveState, int numNodes);
 
 #endif

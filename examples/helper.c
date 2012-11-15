@@ -168,7 +168,7 @@ int moreThanTwoSlaves(int * a, int num)
       if(a[i] == SLAVE_DEAD)
 	rest--;
     }
-  if(rest == 2)
+  if(rest <= 2)
     return 0;
   else
     return 1;
@@ -190,10 +190,10 @@ int getReadySlave(int * a, int num)
 
 
 // Print Slave States
-void prtslavestate(int * slaveState, int numNodes)
+void prtSlaveState(int * slaveState, int numNodes)
 {
   int x;
-  printf("Node:");
+  printf("Slave:");
   for(x=0; x<numNodes; x++)
     {
       printf("\t%d", x);
