@@ -26,6 +26,7 @@ static struct argp_option options[] = {
   {"qsort",  'q', 0, 0, "use local quick sort", 3},
   {"msort",  'm', 0, 0, "use local merge sort", 3},
   {"misort", 'i', 0, 0, "use local merge with insertion sort", 3},
+  {"debug",  'd', 0, 0, "show debug messages", 3},
   { 0 }
 };
 
@@ -55,7 +56,10 @@ static error_t parse_opt(int key, char *arg, struct argp_state *state)
     case 'C':
       cfg->cachesize = atoi(arg);
       break;
-      /* alle Argumente geparst*/
+    case 'd':
+      cfg->dbg = 1;
+      break;
+    /* alle Argumente geparst*/
     case ARGP_KEY_END:
       if (cfg->volumesize < 0 || cfg->chunksize <0
 	  || (cfg->volumesize % cfg->chunksize) != 0)
@@ -68,6 +72,11 @@ static error_t parse_opt(int key, char *arg, struct argp_state *state)
 	  printf("VOLUMESIZE <= CHUNKSIZE\n");
 	  argp_usage(state);
 	}
+      else if (cfg->cachsize <= 2)
+	{
+	  printf("CACHESIZE to small\n");
+	  argp_usage(state);
+	}
 	break;
     default:
       return ARGP_ERR_UNKNOWN;
@@ -78,11 +87,11 @@ static error_t parse_opt(int key, char *arg, struct argp_state *state)
 /* Our argp parser. */
 static struct argp argopts = {options, parse_opt, args_doc, doc};
 
-void argparse(int argc, char **argv, struct config *cfg)
+error_t argparse(int argc, char **argv, struct config *cfg)
 {
   /* Parse our arguments; every option seen by parse_opt will
      be reflected in arguments. */
-  argp_parse(&argopts, argc, argv, ARGP_NO_ARGS, 0, cfg);
+  return argp_parse(&argopts, argc, argv, ARGP_NO_ARGS, 0, cfg);
 }
 
 /* * * * * * * * * * * * * * * * * */
@@ -204,4 +213,17 @@ void prtSlaveState(int * slaveState, int numNodes)
       printf("\t%d", slaveState[x]);
     }
   printf("\n");
+}
+
+// nur ein Slave hat alle Daten bekommen
+// gibt true zurück wenn anzahl slaves mit volumesize>0 == 1
+int singleSlave(int * a, int num, int volumesize)
+{
+  int i;
+  for(i=1; i<num; i++)
+    {
+		if(a[i] == volumesize)
+			return 1;
+    }
+  return 0;		
 }

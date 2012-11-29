@@ -24,6 +24,7 @@ struct config
   int qsort;
   int msort;
   int isort;
+  int dbg;
 };
 
 // argument passing function
@@ -37,6 +38,7 @@ int moreThanTwoSlaves(int * a, int num);
 int slavesReady(int * a, int num);
 int getReadySlave(int * a, int num);
 int waitingForResults(int * a, int num);
+int singleSlave(int * a, int num, int volumesize);
 
 void prtSlaveState(int * slaveState, int numNodes);
 

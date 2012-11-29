@@ -110,7 +110,7 @@ void set_buffer(struct buffer *b, int * data, int size)
   b->size = size;
 }
 
-void mergesort(struct buffer *b, struct buffer *tmp)
+void mergesort(struct buffer *b, struct buffer *tmp, int csize)
 {
   // buffers for each partition
   struct buffer leftb;
@@ -128,6 +128,7 @@ void mergesort(struct buffer *b, struct buffer *tmp)
   int * t;
   int * last;
 
+
   /* buffer size check - termination check*/
   // sort buffer elements
   if (b->size == 2)
@@ -142,6 +143,12 @@ void mergesort(struct buffer *b, struct buffer *tmp)
       return;
     }
   else
+  // if buffer smaller than cache size do insertion sort
+  if (b->size <= csize)
+    {
+        inssort(b);
+    }
+  else
     {
 
       // set range for new partitions
@@ -151,9 +158,9 @@ void mergesort(struct buffer *b, struct buffer *tmp)
       set_buffer(&rtmpb, tmp->data + tmp->size/2, (tmp->size+1)/2);
 
       /* recursion */
-      if (leftb.size > 1)  mergesort(&leftb,  &ltmpb);
+      if (leftb.size > 1)  mergesort(&leftb,  &ltmpb, csize);
 
-      if (rightb.size > 1) mergesort(&rightb, &rtmpb);
+      if (rightb.size > 1) mergesort(&rightb, &rtmpb, csize);
 
       /* merge - merge it by pointer only merge : ) */
       // left, right and temp working pointer
@@ -187,6 +194,35 @@ void mergesort(struct buffer *b, struct buffer *tmp)
       /* copy tmp buffer back to original buffer */
       memcpy(b->data, tmp->data, tmp->size * sizeof(int));
    }
+}
+
+/* ------------------------------------
+ *  insertion sort (local)
+ * ------------------------------------ */
+
+void inssort(struct buffer *b)
+{
+  int * i;
+  int * j;
+  int item;
+
+  // mit dem Zweiten beginnen
+  i = b->data + 1;
+  // bis zum Ende
+  while(i < b->data + b->size)
+  {
+    item = *i;
+    //    printf("%d\t", item);
+    j = i;
+    //solange j nicht am Anfang und item kleiner als Vorgänger
+    while ((j > b->data) && (item < *(i-1)))
+      {
+        // eins weiter kopieren und eins zurück gehen
+        *j-- = *(j - 1);
+      }
+    *j = item;
+    i++;
+  }
 }
 
 /* ------------------------------------

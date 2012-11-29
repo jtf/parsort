@@ -31,15 +31,21 @@ int main(int argc, char **argv) {
     int rank, numNodes, numChunks;
     char hostname[1024];
 
-    // Argumente parsen
+    // Argumente parsen / Default-config
     struct config cfg;
-    argparse(argc, argv, &cfg);
+    cfg.debug = 0;
+    cfg.cachesize = 10000;
+
+    if (! argparse(argc, argv, &cfg) )
+      {
+        exit;
+      }
 
     MPI_Init (&argc, &argv);
     MPI_Comm_rank (MPI_COMM_WORLD, &rank);		//liefert Node-Nr.
     MPI_Comm_size (MPI_COMM_WORLD, &numNodes);	//liefert Anzahl
 
-	MPI_Status status;
+    MPI_Status status;
     gethostname(hostname, sizeof (hostname));
 
 	/* ###################################################################### */
@@ -71,17 +77,17 @@ int main(int argc, char **argv) {
 		}
 		else
 		{
-			printf("Master: Erstellen des Volumes fehlgeschlagen!\n");
-		    MPI_Finalize();
+			if(cfg->dbg) printf("Master: Erstellen des Volumes fehlgeschlagen!\n");
+		        MPI_Finalize();
 			exit;
 		}
-		printf("Master: Init erfolgreich.\n");
+		if(cfg->dbg) printf("Master: Init erfolgreich.\n");
 		MPI_Barrier(MPI_COMM_WORLD);
 
 		/* ////////////////////////////////////////////////////////////// */
 		/* //Chunks an Nodes senden////////////////////////////////////// */
 		/* ////////////////////////////////////////////////////////////// */
-		printf("Master: Beginne mit Senden der Chunks.\n");
+		if(cfg->dbg) printf("Master: Beginne mit Senden der Chunks.\n");
 		//Solange Chunk an verfügbaren Node senden, wie noch Chunks vorhanden
 		while(pWorker<=pEnd)
 		{
@@ -94,7 +100,7 @@ int main(int argc, char **argv) {
 		}
 
 		//END_TAG an alle senden	
-		printf("\nMaster: Beginne mit Senden der END_TAGs.\n");
+		if(cfg->dbg) printf("\nMaster: Beginne mit Senden der END_TAGs.\n");
 		for(i=1; i<numNodes; i++)
 		{
 			MPI_Recv(0, 0, MPI_INT, i, MPI_ANY_TAG, MPI_COMM_WORLD, &status);
@@ -152,7 +158,7 @@ int main(int argc, char **argv) {
 				minNode = min_array(slaveState, numNodes, maxNode);
 				if(minNode == maxNode)
 				{
-					printf("\n\nFehler!!!! minNode == maxNode!!!!\n\n");
+					if(cfg->dbg) printf("\n\nFehler!!!! minNode == maxNode!!!!\n\n");
 					break;
 				}
 				//Senden der Merging-Infos an die Slaves
@@ -230,25 +236,25 @@ int main(int argc, char **argv) {
 			slaveState[slaveR]=SLAVE_DEAD;
 
 
-			printf("Master: Warten auf Ergebnis von Node %d. \n", slaveL);
+			if(cfg->dbg) printf("Master: Warten auf Ergebnis von Node %d. \n", slaveL);
 			MPI_Recv(preResultL.data, preResultL.size, MPI_INT, slaveL, MPI_ANY_TAG, MPI_COMM_WORLD, &status);
-			printf("Master: Ergebnis erfolgreich empfangen. \n");		
+			if(cfg->dbg) printf("Master: Ergebnis erfolgreich empfangen. \n");		
 
-			printf("Master: Warten auf Ergebnis von Node %d. \n", slaveR);
+			if(cfg->dbg) printf("Master: Warten auf Ergebnis von Node %d. \n", slaveR);
 			MPI_Recv(preResultR.data, preResultR.size, MPI_INT, slaveR, MPI_ANY_TAG, MPI_COMM_WORLD, &status);
-			printf("Master: Ergebnis erfolgreich empfangen. \n");		
+			if(cfg->dbg) printf("Master: Ergebnis erfolgreich empfangen. \n");		
 
 
-			printf("Master: Beginne mit finalem Merge.\n");
+			if(cfg->dbg) printf("Master: Beginne mit finalem Merge.\n");
 			merge(&preResultL, &preResultR, &volume);
-			printf("Master: Finales Merging abgeschlossen!\n");
+			if(cfg->dbg) printf("Master: Finales Merging abgeschlossen!\n");
 		}
 
-		printf("\n");
+		if(cfg->dbg) printf("\n");
 		prtbhead(&volume,5);
-		printf("\n");
+		if(cfg->dbg) printf("\n");
 		prtbtail(&volume,5);
-		printf("\n");
+		if(cfg->dbg) printf("\n");
 	}
 
 
@@ -269,7 +275,7 @@ int main(int argc, char **argv) {
 		int runSize;
 		allocbuf(&slaveResult, 0);
 
-		printf("Slave %d: Init erfolgreich.\n", rank);
+		if(cfg->dbg) printf("Slave %d: Init erfolgreich.\n", rank);
 		//Master/Slave-Sync
 		MPI_Barrier(MPI_COMM_WORLD);
 
@@ -277,7 +283,7 @@ int main(int argc, char **argv) {
 		/* ////////////////////////////////////////////////////////////// */
 		/* //Chunks verarbeiten////////////////////////////////////////// */
 		/* ////////////////////////////////////////////////////////////// */
-		printf("Slave %d: Beginne mit Verarbeiten der Chunks.\n", rank);
+		if(cfg->dbg) printf("Slave %d: Beginne mit Verarbeiten der Chunks.\n", rank);
 		int anyData=0;
 		while(1)
 		{
@@ -296,7 +302,7 @@ int main(int argc, char **argv) {
 			//printf("\n\n");
 			if(status.MPI_TAG == END_TAG)
 			{
-				printf("Slave %d: END_TAG empfangen.\n", rank);
+				if(cfg->dbg) printf("Slave %d: END_TAG empfangen.\n", rank);
 				freebuf(&chunk);
 				break;
 			}
@@ -352,13 +358,13 @@ int main(int argc, char **argv) {
 			}
 			else if (status.MPI_TAG == DEAD_TAG)
 			{
-				printf("Slave %d: Ich arme Sau habe nie Daten bekommen!\n",rank);
+				if(cfg->dbg) printf("Slave %d: Ich arme Sau habe nie Daten bekommen!\n",rank);
 				break;
 			}
 			else
 			{
-				printf("\n\nUngueltiges TAG empfangen!!!!! Tag: %d\n", status.MPI_TAG);
-				printf("slaveResult Slave %d: %d", rank, slaveResult.size);
+				if(cfg->dbg) printf("\n\nUngueltiges TAG empfangen!!!!! Tag: %d\n", status.MPI_TAG);
+				if(cfg->dbg) printf("slaveResult Slave %d: %d", rank, slaveResult.size);
 			}
 		}
 		//printf("\nNode %d ist tot und rutscht ins Barrier.\n\n", rank);
@@ -371,19 +377,9 @@ int main(int argc, char **argv) {
 	/********************************************************/
 	MPI_Barrier(MPI_COMM_WORLD);
     MPI_Finalize();
+    printf("\n");
     return EXIT_SUCCESS;
 }
 
-// nur ein Slave hat alle Daten bekommen
-// gibt true zurück wenn anzahl slaves mit volumesize>0 == 1
-int singleSlave(int * a, int num, int volumesize)
-{
-  int i;
-  for(i=1; i<num; i++)
-    {
-		if(a[i] == volumesize)
-			return 1;
-    }
-  return 0;		
-}
+
 
