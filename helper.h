@@ -23,12 +23,12 @@ struct config
   int cachesize;
   int qsort;
   int msort;
-  int isort;
   int dbg;
+  int prtopt;
 };
 
 // argument passing function
-void argparse(int argc, char **argv, struct config *cfg);
+error_t argparse(int argc, char **argv, struct config *cfg);
 
 // slave status functions
 int max_array(int * a, int num);

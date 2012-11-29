@@ -22,11 +22,11 @@
 static struct argp_option options[] = {
   {"volume", 'v', "VOLUMESIZE", 0, "volume size (k * chunk size, k>4)", 1},
   {"chunk",  'c', "CHUNKSIZE",  0, "chunk size > 3", 1},
-  {"cache",  'C', "CACHESIZE", 0, "L3 cache size for insertion sort", 2 },
+  {"cache",  'C', "CACHESIZE", 0, "L3 cache size for insertion sort [default 10000]", 2 },
   {"qsort",  'q', 0, 0, "use local quick sort", 3},
   {"msort",  'm', 0, 0, "use local merge sort", 3},
-  {"misort", 'i', 0, 0, "use local merge with insertion sort", 3},
   {"debug",  'd', 0, 0, "show debug messages", 3},
+  {"printopt", 'p', 0, 0, "print argp options", 3},
   { 0 }
 };
 
@@ -37,7 +37,7 @@ static char doc[] = "MPI based merge sort on multiple nodes\v(c)2012";
 static char args_doc[] = "";
 const char *argp_program_version = "1.0";
 const char *argp_program_bug_address = "<bug@example.com>";
-  
+
 /* Parse a single option. */
 static error_t parse_opt(int key, char *arg, struct argp_state *state)
 {
@@ -59,6 +59,17 @@ static error_t parse_opt(int key, char *arg, struct argp_state *state)
     case 'd':
       cfg->dbg = 1;
       break;
+    case 'p':
+      cfg->prtopt = 1;
+      break;
+    case 'q':
+      cfg->qsort = 1;
+      cfg->msort = 0;
+      break;
+    case 'm':
+      cfg->qsort = 0;
+      cfg->msort = 1;
+      break;
     /* alle Argumente geparst*/
     case ARGP_KEY_END:
       if (cfg->volumesize < 0 || cfg->chunksize <0
@@ -72,7 +83,7 @@ static error_t parse_opt(int key, char *arg, struct argp_state *state)
 	  printf("VOLUMESIZE <= CHUNKSIZE\n");
 	  argp_usage(state);
 	}
-      else if (cfg->cachsize <= 2)
+      else if (cfg->cachesize <= 2)
 	{
 	  printf("CACHESIZE to small\n");
 	  argp_usage(state);
