@@ -30,37 +30,39 @@ note over Slave2: Lokales Sortieren und lokales Mergen
   end
 
 
+'note over Master: Alle Chunks verteilt und sortiert
+
+
+== END_TAG verschicken ==
+
+  loop Slaves
+    Slave1 -> Master : bereit ()
+    Slave2 -> Master : bereit ()
+    Slave3 -> Master : bereit ()
+
+    Master -> Slave1 : END_TAG ()
+    Master -> Slave2 : END_TAG ()
+    Master -> Slave3 : END_TAG ()
+  end
+
 == Inter-Slave-Merge ==
 
-note over Master: Alle Chunks verteilt und sortiert
 
 group while moreThanTwoSlaves() oder mindestens noch einer beschaeftigt
 
-'== END_TAG verschicken ==
-
-    Slave3 -> Master : bereit  ()
-    Master -> Slave3 : END_TAG () 
     Slave3 -> Master : (slave3Result.size)
-|||
-    Slave1 -> Master : bereit ()
-    Master -> Slave1 : END_TAG ()
     Slave1 -> Master : (slave1Result.size)
-|||
+
     Master -> Slave3 : DO_SEND_TAG (target: Slave1)
     Master -> Slave1 : DO_RECV_TAG (slave3Result.size)
 
     Slave3 -> Slave1 : (slave3Result.data)
     destroy Slave3
 
-note over Slave1: merge(slave1Result.data, slave3Result.data)    
-|||
-    Slave2 -> Master : bereit ()
-    Master -> Slave2 : END_TAG () 
-    Slave2 -> Master : (slave2Result.size)
-|||
-    Slave1 -> Master : (slave1Result.size)
-    
+note over Slave1: merge(slave1Result.data, slave3Result.data)
 
+    Slave2 -> Master : (slave2Result.size)
+    Slave1 -> Master : (slave1Result.size)
 end
 
 == Master-Merge ==

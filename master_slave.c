@@ -24,7 +24,7 @@
 #define SLAVE_BUSY 0
 //SLAVE_READY = Größe des SlaveStacks
 
-//MINIMUM 2 SLAVES (3 NODES) BEI PROGRAMMSTART
+//MINIMUM 1 SLAVES (2 NODES) BEI PROGRAMMSTART
 
 
 int main(int argc, char **argv) {
