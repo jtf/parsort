@@ -1,5 +1,6 @@
 #include <stdlib.h>
 #include <stdio.h>
+#include <stdint.h>
 #include <time.h>
 #include <math.h>
 #include <mpi.h>
@@ -28,8 +29,9 @@
 //MINIMUM 1 SLAVES (2 NODES) BEI PROGRAMMSTART
 
 // Zeitdifferenz in ns
-uint64_t timediff (struct timespec* start, struct timespec* end) {
-  return 1000000000*(end-tv_sec - start->tv_sec) + end->tv_nsec - start->tv_nsec;
+uint64_t timediff(struct timespec* start, struct timespec* end)
+{
+  return 1000000000*(end->tv_sec - start->tv_sec) + end->tv_nsec - start->tv_nsec;
 }
 
 
@@ -398,7 +400,7 @@ int main(int argc, char **argv) {
       // Zeit bis alle Merges abgeschlossen
       clock_gettime(CLOCK_MONOTONIC, &t_4);
 
-      printf ("%i\t%i\t%i\t%i\n", 
+      printf ("%llu\t%llu\t%llu\t%llu\n", 
 	      timediff(&t_0, &t_1), timediff(&t_0, &t_2),
 	      timediff(&t_0, &t_3), timediff(&t_0, &t_4));
     }

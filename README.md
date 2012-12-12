@@ -9,7 +9,7 @@ parsort
 
 compile with:
 
-    mpicc master_slave.c tools.c helper.c
+    mpicc -lrt master_slave.c tools.c helper.c
 
 start with:
 
