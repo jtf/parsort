@@ -400,9 +400,11 @@ int main(int argc, char **argv) {
       // Zeit bis alle Merges abgeschlossen
       clock_gettime(CLOCK_MONOTONIC, &t_4);
 
-      printf ("%llu\t%llu\t%llu\t%llu\n", 
-	      timediff(&t_0, &t_1), timediff(&t_0, &t_2),
-	      timediff(&t_0, &t_3), timediff(&t_0, &t_4));
+      // Gesamtzeit, Initzeit, Chunkverteilzeit, Endtagverteilzeit, Mergezeit
+      printf ("%llu\t%llu\t%llu\t%llu\t%llu\n",
+	      timediff(&t_0, &t_4),
+	      timediff(&t_0, &t_1), timediff(&t_1, &t_2),
+	      timediff(&t_2, &t_3), timediff(&t_3, &t_4));
     }
 
   MPI_Finalize();
