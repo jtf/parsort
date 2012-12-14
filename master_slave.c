@@ -28,10 +28,10 @@
 
 //MINIMUM 1 SLAVES (2 NODES) BEI PROGRAMMSTART
 
-// Zeitdifferenz in ns
+// Zeitdifferenz in ms
 uint64_t timediff(struct timespec* start, struct timespec* end)
 {
-  return 1000000000*(end->tv_sec - start->tv_sec) + end->tv_nsec - start->tv_nsec;
+  return (1000000000*(end->tv_sec - start->tv_sec) + end->tv_nsec - start->tv_nsec)/1000000;
 }
 
 
