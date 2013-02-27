@@ -21,7 +21,7 @@ int main(int argc, char *argv[])
 
   struct timespec t_0, t_1, t_2;
 
-  int size = 805306368;
+  int size = 1024*1024*1024;
 
   clock_gettime(CLOCK_MONOTONIC, &t_0);
 
